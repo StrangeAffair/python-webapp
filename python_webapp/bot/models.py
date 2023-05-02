@@ -41,6 +41,9 @@ class WordRecord(models.Model):
         verbose_name='Комментарий',
         default=''
     )
+    added_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
          verbose_name = 'Слово'
@@ -53,7 +56,7 @@ class LessonRecord(models.Model):
         on_delete=models.PROTECT,
         default=0
     )
-    duration = models.DurationField(
+    duration = models.IntegerField(
         verbose_name='Длительность'
     )
     date = models.DateTimeField(
@@ -68,3 +71,26 @@ class LessonRecord(models.Model):
     class Meta:
          verbose_name = 'Занятие'
          verbose_name_plural = 'Занятия'
+
+class GameRecord(models.Model):
+    user = models.ForeignKey(
+        to='bot.User',
+        verbose_name='Пользователь',
+        on_delete=models.PROTECT,
+        default=0
+    )
+    date = models.DateTimeField(
+        verbose_name='Дата',
+        auto_now_add=True
+    )
+    n_questions = models.PositiveIntegerField(
+        verbose_name='Число вопросов',
+    )
+
+    n_answers = models.PositiveIntegerField(
+        verbose_name='Число вопросов',
+    )
+
+    class Meta:
+         verbose_name = 'Игра'
+         verbose_name_plural = 'Игры'
