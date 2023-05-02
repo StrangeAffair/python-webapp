@@ -37,7 +37,7 @@ def get_stat_inline_keyboard() -> types.InlineKeyboardMarkup:
 def act_on_stat_command(u_id: int) -> None:
     """ Handler for stat command"""
     user = User.objects.get(external_id=u_id)
-    text = f"Так-так, <b>{user.username}</b>, давай посмотрим на твой прогресс"
+    text = f"Прогресс <b>{user.username}</b>"
     ikbm = get_stat_inline_keyboard()
 
     bot.send_message(u_id, text=text, reply_markup=ikbm, parse_mode='HTML')

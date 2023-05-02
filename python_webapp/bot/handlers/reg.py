@@ -15,14 +15,14 @@ def act_on_reg_command(message: types.Message) -> None:
 
         bot.send_message(
             message.from_user.id,
-            (f"<b>{user.username}</b>, вы уже зарегистрированы😅\n"
+            (f"<b>{user.username}</b>, вы уже зарегистрированы\n"
              "Для удаления профиля используйте /del"),
             parse_mode='HTML'
         )
     else:
         msg = bot.send_message(
             message.from_user.id,
-            "Начнем регистрацию😉 Как вас зовут?"
+            "Начнем регистрацию. Как вас зовут?"
         )
         bot.register_next_step_handler(msg, callback=get_user_name)
 

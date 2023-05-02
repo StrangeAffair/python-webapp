@@ -43,9 +43,9 @@ def get_date(message: types.Message) -> None:
 
     # validation of entered data
     if not date_validator(entered_date):
-        text = (f"Неправильный формат даты (<b>{entered_date}</b>) 😓"
+        text = (f"Неправильный формат даты (<b>{entered_date}</b>)"
                 "Должно быть <u>дд.мм.гггг</u>"
-                "Давайте еще раз:")
+                "Введите еще раз:")
 
         msg = bot.send_message(u_id, text=text, parse_mode='HTML')
         bot.register_next_step_handler(msg, callback=get_date)
@@ -81,8 +81,8 @@ def get_duration(message: types.Message) -> None:
 
     g_input_user_data[u_id].duration = int(message.text)
 
-    yes_text = 'Ну разумеется 😉'
-    no_text = 'Неа 🙄'
+    yes_text = 'Да'
+    no_text = 'Нет'
     kb = get_yes_no_inline_keyboard(COMMENT_PREFIX, yes_text, no_text)
 
     text = [
@@ -104,12 +104,12 @@ def callback_on_comment(call: types.CallbackQuery) -> None:
         return
 
     if answer == 'yes':
-        msg = bot.send_message(u_id, text="Тогда вводите пояснение 😂")
+        msg = bot.send_message(u_id, text="Введите пояснение")
         bot.register_next_step_handler(msg, callback=get_lesson_record_comment)
 
     elif answer == 'no':
         g_input_user_data[u_id].comment = ''
-        msg = bot.send_message(u_id, text="Ну ладно...")
+        msg = bot.send_message(u_id, text="Пояснение отсутствует")
 
         confirm_add_lesson(u_id)
     else:
@@ -136,13 +136,13 @@ def confirm_add_lesson(u_id: int) -> None:
 
     lesson = g_input_user_data[u_id]
     comment = f"\n({lesson.comment})" if lesson.comment != '' else ''
-    text = (f"Все правильно?\n"
+    text = (f"Все верно?\n"
             f"Дата: <i>{date_django_to_str(lesson.date)}</i>\n"
             f"Длительность: <i>{lesson.duration}</i>" +
             comment)
 
-    yes_text = "Да, все так 👍"
-    no_text = "Я вводил другое 👎"
+    yes_text = "Да"
+    no_text = "Нет"
     kb = get_yes_no_inline_keyboard(CONFIRM_PREFIX, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')

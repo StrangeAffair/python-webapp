@@ -58,7 +58,7 @@ def act_on_game_command(u_id: int) -> None:
 
     global g_game_user_data
 
-    text = "Давай повторять английские слова 🧠"
+    text = "Повторяем английские слова"
     bot.send_message(u_id, text=text)
 
     g_game_user_data[u_id] = GameMetaData(words=[])
@@ -152,11 +152,11 @@ def send_score(u_id: int) -> None:
     result = f'Результат: {game.n_right_questions}/{game.n_asked_questions}. '
 
     if ratio < 0.5:
-        text = 'Неплохо, но надо бы подучить слова 😅'
+        text = 'Неплохой результат'
     elif 0.5 < ratio < 0.8:
-        text = 'Хороший результат 👍'
+        text = 'Хороший результат'
     elif ratio > 0.8:
-        text = 'Отличный результат 👏'
+        text = 'Отличный результат'
     bot.send_message(u_id, text=result + text, reply_markup=start_menu())
 
     GameRecord(user=user, n_questions=game.n_asked_questions,

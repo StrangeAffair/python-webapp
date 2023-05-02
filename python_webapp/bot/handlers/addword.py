@@ -21,7 +21,7 @@ def act_on_addword_command(u_id: int) -> None:
 
     user = User.objects.get(external_id=u_id)
 
-    text = "Ура, пополняем словарь😃 Введите новое слово:"
+    text = "Введите новое слово:"
     msg = bot.send_message(u_id, text=text)
 
     global g_input_user_data
@@ -76,7 +76,7 @@ def get_word_record_en_word(message: types.Message) -> None:
                          reply_markup=start_menu())
         return
 
-    text = f"Записал <i>{message.text}</i>👌 Введите перевод:"
+    text = f"Записано <i>{message.text}</i>. Введите перевод:"
 
     bot.send_message(u_id, text=text, parse_mode='HTML')
 
@@ -114,10 +114,10 @@ def get_word_record_ru_translation(message: types.Message) -> None:
 
     g_input_user_data[u_id].ru_translation = message.text
 
-    text = f"Перевод записан <i>{message.text}</i>👌 Добавим пояснение?"
+    text = f"Перевод записан <i>{message.text}</i>. Добавим пояснение?"
 
-    yes_text = 'Ну разумеется 😉'
-    no_text = 'Неа 🙄'
+    yes_text = 'Да'
+    no_text = 'Нет'
     kb = get_yes_no_inline_keyboard(comment_prefix, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
@@ -131,10 +131,10 @@ def callback_on_comment(call: types.CallbackQuery) -> None:
     answer = call.data[len(comment_prefix):]
 
     if answer == 'yes':
-        msg = bot.send_message(u_id, text="Тогда вводите пояснение 😂")
+        msg = bot.send_message(u_id, text="Введите пояснение")
         bot.register_next_step_handler(msg, callback=get_word_record_comment)
     elif answer == 'no':
-        msg = bot.send_message(u_id, text="Ну ладно...")
+        msg = bot.send_message(u_id, text="Пояснение отсутствует")
         confirm_add_word(u_id)
 
 
@@ -165,8 +165,8 @@ def confirm_add_word(u_id: int) -> None:
             f"Перевод: <i>{word.ru_translation}</i>" +
             comment)
 
-    yes_text = "Да, все так 👍"
-    no_text = "Я вводил другое 👎"
+    yes_text = "Да"
+    no_text = "Нет"
     kb = get_yes_no_inline_keyboard(confirm_prefix, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
