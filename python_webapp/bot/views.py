@@ -13,6 +13,7 @@ import telebot  # type: ignore # pylint: disable=E0401
 
 from bot.bot_main import bot
 from bot.handlers import reg, start, addword, addlesson, stat, delete
+from bot.handlers import help as help_cmd
 
 
 # Create your views here.
@@ -31,13 +32,6 @@ addword.register_handler_addword()
 addlesson.register_handler_addlesson()
 stat.register_stat_handler()
 delete.register_del_handler()
-
-
-@bot.message_handler(commands=['help'])  # type: ignore
-def send_welcome(message: str) -> None:
-    """help command"""
-    # TO DO:
-    bot.reply_to(message, "How are you doing?")
-
+help_cmd.register_help_handler()
 
 bot.polling(non_stop=True)

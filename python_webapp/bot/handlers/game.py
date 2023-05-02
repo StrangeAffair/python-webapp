@@ -45,7 +45,8 @@ def act_on_game_command(u_id: int) -> None:
     """ Handler for game command"""
     text: Union[List[str], str]
 
-    n_words = WordRecord.objects.count()
+    user = User.objects.get(external_id=u_id)
+    n_words = WordRecord.objects.filter(user=user).count()
     if n_words < CONST_N_CHOICES:
         text = [
             f"В словаре слишком мало слов ({n_words})",
@@ -57,7 +58,6 @@ def act_on_game_command(u_id: int) -> None:
 
     global g_game_user_data
 
-    user = User.objects.get(external_id=u_id)
     text = "Давай повторять английские слова 🧠"
     bot.send_message(u_id, text=text)
 

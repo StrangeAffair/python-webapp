@@ -64,9 +64,9 @@ def callback_on_stat_command(call: types.CallbackQuery) -> None:
         text = []
         for lesson in lessons:
             string = [
-                f"<b>{lesson.date}</b>:",
-                f"{lesson.duration} (минуты)",
-                f"[<i>{lesson.comment}</i>]",
+                f'<b>{lesson.date.strftime("%d-%m-%Y")}</b>:',
+                f'{lesson.duration} (минуты)',
+                f'[<i>{lesson.comment}</i>]',
             ]
             text.append(' '.join(string))
         text = '\n'.join(text)
