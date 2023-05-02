@@ -87,7 +87,7 @@ def get_duration(message: types.Message) -> None:
 
     text = [
         f"Отлично, записал <i>{message.text}</i> (минуты)",
-        "Добавим пояснение?",
+        "Добавить пояснение?",
     ]
     text = "".join(text)
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')

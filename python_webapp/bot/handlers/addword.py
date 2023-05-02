@@ -114,7 +114,7 @@ def get_word_record_ru_translation(message: types.Message) -> None:
 
     g_input_user_data[u_id].ru_translation = message.text
 
-    text = f"Перевод записан <i>{message.text}</i>. Добавим пояснение?"
+    text = f"Перевод записан <i>{message.text}</i>. Добавить пояснение?"
 
     yes_text = 'Да'
     no_text = 'Нет'
