@@ -1,13 +1,14 @@
+from typing import List, Union
 import random
+
 from telebot import types  # type: ignore
 from typing import Dict
 from dataclasses import dataclass
-from typing import List
 from functools import partial
 
 from bot.bot_main import bot
 from bot.models import User, WordRecord, GameRecord
-from bot.utils import start_menu, start_text
+from bot.utils import start_menu
 
 # prefixes for callback queris
 select_prefix = 'select_game_inline_keyboard_'
@@ -42,11 +43,15 @@ g_game_user_data: Dict[int, GameMetaData] = {}
 
 def act_on_game_command(u_id: int) -> None:
     """ Handler for game command"""
+    text: Union[List[str], str]
 
     n_words = WordRecord.objects.count()
     if n_words < CONST_N_CHOICES:
-        text = (f"В словаре слишком мало слов ({n_words}) 😓 "
-                 "Должно быть <u>минимум 5 слов</u>.")
+        text = [
+            f"В словаре слишком мало слов ({n_words})",
+            "Должно быть <u>минимум 5 слов</u>.",
+        ]
+        text = '\n'.join(text)
         bot.send_message(u_id, text=text, parse_mode='HTML')
         return
 
@@ -93,10 +98,11 @@ def ask_word_ru_translation(u_id: int) -> None:
 
     right_answer = word.ru_translation
 
-    all_choices = list(
-        (WordRecord.objects.filter(user=user) &
-         WordRecord.objects.exclude(id=word.pk)).values_list('ru_translation', flat=True)
-    )
+    temp1 = WordRecord.objects.filter(user=user)
+    temp2 = WordRecord.objects.exclude(id=word.pk)
+    all_choices = temp1 & temp2
+    all_choices = all_choices.values_list('ru_translation', flat=True)
+    all_choices = list(all_choices)
 
     choices = random.sample(all_choices, CONST_N_CHOICES-1)
     choices.extend([word.ru_translation])
@@ -117,10 +123,10 @@ def check_choice(right_answer: str, u_id: int, message: types.Message) -> None:
     game = g_game_user_data[u_id]
 
     if message.text == right_answer:
-        text = f'Верно ✅'
+        text = 'Верно'
         game.n_right_questions += 1
     else:
-        text = f'Неверно ❌, правильный ответ <i>{right_answer}</i>'
+        text = f'Неверно, правильный ответ <i>{right_answer}</i>'
 
     bot.send_message(
         u_id,

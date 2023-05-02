@@ -1,11 +1,12 @@
+from typing import List, Union
+
 from telebot import types  # type: ignore
 from typing import Dict
 
 from bot.bot_main import bot
 from bot.models import User, WordRecord
 from bot.utils import get_yes_no_inline_keyboard, start_menu
-from bot.utils import int_validator, word_validator
-
+from bot.utils import word_validator
 
 # prefixes to distinguish between callback queris
 comment_prefix = 'comment_addword_inline_keyboard_'
@@ -34,6 +35,8 @@ def act_on_addword_command(u_id: int) -> None:
 
 def get_word_record_en_word(message: types.Message) -> None:
     """ Get enlish word from message"""
+    text: Union[List[str], str]
+
     u_id = message.from_user.id
     user = User.objects.get(external_id=u_id)
     global g_input_user_data
@@ -44,8 +47,12 @@ def get_word_record_en_word(message: types.Message) -> None:
     entered_data = message.text
     # validation of entered data
     if not word_validator(entered_data):
-        text = (f"Неправильный формат (<b>{entered_data}</b>)😓 Слово может содержать только буквы и цифры.\n"
-                 "Давайте еще раз:")
+        text = [
+            f"Неправильный формат (<b>{entered_data}</b>)",
+            "Слово может содержать только буквы и цифры.",
+            "Введите слово ещё раз:",
+        ]
+        text = '\n'.join(text)
 
         msg = bot.send_message(u_id, text=text, parse_mode='HTML')
         bot.register_next_step_handler(msg, callback=get_word_record_en_word)
@@ -53,14 +60,19 @@ def get_word_record_en_word(message: types.Message) -> None:
 
     g_input_user_data[u_id].en_word = message.text.lower()
 
-    if WordRecord.objects.filter(user=user, en_word=message.text.lower()).exists():
-        word = WordRecord.objects.get(user=user, en_word=message.text.lower())
-        text = ( "Такое слово уже есть в словаре 🙃"
-                f"Слово: <i>{word.en_word}</i>\n"
-                f"Перевод: <i>{word.ru_translation}</i>\n" +
-                f"[<i>{word.comment}</i>]")
+    word = message.text.lower()
+    if WordRecord.objects.filter(user=user, en_word=word).exists():
+        word = WordRecord.objects.get(user=user, en_word=word)
+        text = [
+            "Такое слово уже есть в словаре",
+            f"Слово: <i>{word.en_word}</i>",
+            f"Перевод: <i>{word.ru_translation}</i>",
+            f"[<i>{word.comment}</i>]",
+        ]
+        text = '\n'.join(text)
 
-        bot.send_message(u_id, text=text, parse_mode='HTML', reply_markup=start_menu)
+        bot.send_message(u_id, text=text, parse_mode='HTML',
+                         reply_markup=start_menu)
         return
 
     text = f"Записал <i>{message.text}</i>👌 Введите перевод:"
@@ -75,6 +87,8 @@ def get_word_record_en_word(message: types.Message) -> None:
 
 def get_word_record_ru_translation(message: types.Message) -> None:
     """ Get translation from message """
+    text: Union[List[str], str]
+
     u_id = message.from_user.id
     global g_input_user_data
 
@@ -84,11 +98,17 @@ def get_word_record_ru_translation(message: types.Message) -> None:
     entered_data = message.text
     # validation of entered data
     if not word_validator(entered_data):
-        text = (f"Неправильный формат (<b>{entered_data}</b>)😓 Слово может содержать только буквы и цифры.\n"
-                 "Давайте еще раз:")
+        text = [
+            f"Неправильный формат (<b>{entered_data}</b>)",
+            "Слово может содержать только буквы и цифры.",
+            "Введите слово ещё раз:",
+        ]
+        text = '\n'.join(text)
 
         msg = bot.send_message(u_id, text=text, parse_mode='HTML')
-        bot.register_next_step_handler(msg, callback=get_word_record_ru_translation)
+
+        callback = get_word_record_ru_translation
+        bot.register_next_step_handler(msg, callback=callback)
         return
 
     g_input_user_data[u_id].ru_translation = message.text
@@ -153,6 +173,8 @@ def confirm_add_word(u_id: int) -> None:
 
 def callback_on_cofirm_add_word(call: types.CallbackQuery) -> None:
     """ Callback on confirmation question"""
+    text: Union[List[str], str]
+
     assert call.data.startswith(confirm_prefix)
     global g_input_user_data
 
@@ -164,15 +186,21 @@ def callback_on_cofirm_add_word(call: types.CallbackQuery) -> None:
 
     if answer == 'yes':
         g_input_user_data[u_id].save()
-        text = f"Супер! <i>{g_input_user_data[u_id].en_word}</i> успешно добавлено в словарь 🤝"
+        text = [
+            "Cлово",
+            f"<i>{g_input_user_data[u_id].en_word}</i>",
+            "успешно добавлено в словарь",
+        ]
+        text = ' '.join(text)
 
     elif answer == 'no':
-        text = f"Упс... Давайте попробуем еще раз 👉👈"
+        text = "Упс... Давайте попробуем еще раз"
 
     # remove tmp input data
     g_input_user_data.pop(u_id)
 
-    bot.send_message(u_id, text=text, parse_mode='HTML', reply_markup=start_menu())
+    bot.send_message(u_id, text=text, parse_mode='HTML',
+                     reply_markup=start_menu())
 
 
 def register_handler_addword() -> None:

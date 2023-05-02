@@ -1,3 +1,5 @@
+from typing import List, Union
+
 from telebot import types  # type: ignore
 from typing import Dict
 
@@ -20,7 +22,7 @@ def act_on_addlesson_command(u_id: int) -> None:
     """Handler for addlesson command"""
 
     user = User.objects.get(external_id=u_id)
-    text = "Ура, записываем новый урок 🤠 Введите дату урока в формате дд.мм.гггг:"
+    text = "Введите дату урока в формате дд.мм.гггг:"
     msg = bot.send_message(u_id, text=text)
 
     global g_input_user_data
@@ -49,7 +51,9 @@ def get_date(message: types.Message) -> None:
         bot.register_next_step_handler(msg, callback=get_date)
         return
 
-    text = f"Записал <i>{entered_date}</i> 👌\nВведите длительность урока в минутах:"
+    text = f"""Записал <i>{entered_date}</i>
+Введите длительность урока в минутах:
+"""
     bot.send_message(u_id, text=text, parse_mode='HTML')
 
     g_input_user_data[u_id].date = date_str_to_django(entered_date)
@@ -59,6 +63,8 @@ def get_date(message: types.Message) -> None:
 
 def get_duration(message: types.Message) -> None:
     """ Get duration from the message"""
+    text: Union[List[str], str]
+
     u_id = message.from_user.id
     global g_input_user_data
 
@@ -68,8 +74,8 @@ def get_duration(message: types.Message) -> None:
     entered_data = message.text
 
     if not int_validator(entered_data):
-        text = (f"Неправильный формат числа (<b>{entered_data}</b>)"
-                 "Давайте еще раз:")
+        text = (f"""Неправильный формат числа (<b>{entered_data}</b>)
+Давайте еще раз:""")
         msg = bot.send_message(u_id, text=text, parse_mode='HTML')
         bot.register_next_step_handler(msg, callback=get_duration)
         return
@@ -80,7 +86,11 @@ def get_duration(message: types.Message) -> None:
     no_text = 'Неа 🙄'
     kb = get_yes_no_inline_keyboard(comment_prefix, yes_text, no_text)
 
-    text = f"Отлично, записал <i>{message.text}</i> (минуты) 👌 Добавим пояснение?"
+    text = [
+        f"Отлично, записал <i>{message.text}</i> (минуты)",
+        "Добавим пояснение?",
+    ]
+    text = "".join(text)
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
 
 
@@ -154,14 +164,15 @@ def callback_on_cofirm_add_lesson(call: types.CallbackQuery) -> None:
 
     if answer == 'yes':
         g_input_user_data[u_id].save()
-        text = f"Супер! Урок успешно записан 🤝"
+        text = "Урок успешно записан"
     elif answer == 'no':
-        text = f"Упс... Давайте попробуем еще раз 👉👈"
+        text = "Упс... Давайте попробуем еще раз"
 
     # remove tmp input data
     g_input_user_data.pop(u_id)
 
-    bot.send_message(u_id, text=text, parse_mode='HTML', reply_markup=start_menu())
+    bot.send_message(u_id, text=text, parse_mode='HTML',
+                     reply_markup=start_menu())
 
 
 def register_handler_addlesson() -> None:

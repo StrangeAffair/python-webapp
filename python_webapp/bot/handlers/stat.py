@@ -1,3 +1,5 @@
+from typing import List, Union
+
 from telebot import types  # type: ignore
 from telebot.types import InlineKeyboardButton  # type: ignore
 from datetime import datetime, date, timedelta
@@ -43,6 +45,8 @@ def act_on_stat_command(u_id: int) -> None:
 
 def callback_on_stat_command(call: types.CallbackQuery) -> None:
     """ Callback on statistics command"""
+    text: Union[List[str], str]
+
     assert call.data.startswith(stat_prefix)
 
     today = datetime(year=date.today().year,
@@ -56,8 +60,16 @@ def callback_on_stat_command(call: types.CallbackQuery) -> None:
         start_date = today - timedelta(days=30)
         lessons = LessonRecord.objects.filter(
             date__date__gt=start_date) & LessonRecord.objects.filter(user=user)
-        text = ''.join(
-            [f'<b>{l.date}</b>: {l.duration} (минуты) [<i>{l.comment}</i>]\n' for l in lessons])
+
+        text = []
+        for lesson in lessons:
+            string = [
+                f"<b>{lesson.date}</b>:",
+                f"{lesson.duration} (минуты)",
+                f"[<i>{lesson.comment}</i>]",
+            ]
+            text.append(' '.join(string))
+        text = '\n'.join(text)
 
         if text == '':
             bot.send_message(
@@ -67,8 +79,9 @@ def callback_on_stat_command(call: types.CallbackQuery) -> None:
 
     elif answer == 'words_month':
         start_date = today - timedelta(days=30)
-        words = WordRecord.objects.filter(
-            added_at__date__gt=start_date) & WordRecord.objects.filter(user=user)
+        temp1 = WordRecord.objects.filter(added_at__date__gt=start_date)
+        temp2 = WordRecord.objects.filter(user=user)
+        words = temp1 & temp2
 
         text = f'За последние 30 дней сохранено <b>{words.count()}</b> слов'
         bot.send_message(u_id, text=text, parse_mode='HTML')
@@ -78,15 +91,25 @@ def callback_on_stat_command(call: types.CallbackQuery) -> None:
         n_words = 10 if words.count() >= 10 else words.count()
         last_ten_words = WordRecord.objects.filter(
             user=user).order_by('added_at')[:n_words:-1]
-        text = ''.join(
-            [f'<b>{w.en_word}</b> = {w.ru_translation} [<i>{w.comment}</i>]\n' for w in last_ten_words])
+
+        text = []
+        for word in last_ten_words:
+            string = [
+                f'<b>{word.en_word}</b>',
+                '=',
+                f'{word.ru_translation}',
+                f'[<i>{word.comment}</i>]',
+            ]
+            text.append(' '.join(string))
+        text = '\n'.join(text)
 
         if text == '':
             bot.send_message(u_id, text='Пока что словарь пустой...')
         else:
             bot.send_message(u_id, text=text, parse_mode='HTML')
 
-    bot.send_message(u_id, text=start_text, parse_mode='HTML', reply_markup=start_menu())
+    bot.send_message(u_id, text=start_text, parse_mode='HTML',
+                     reply_markup=start_menu())
 
 
 def register_stat_handler() -> None:

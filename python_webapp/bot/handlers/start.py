@@ -1,3 +1,5 @@
+from typing import List, Union
+
 from telebot import types  # type: ignore
 
 from bot.models import User
@@ -11,26 +13,34 @@ from bot.handlers.game import act_on_game_command
 from bot.handlers.stat import act_on_stat_command
 
 
-
-
 def act_on_start_command(message: types.Message) -> None:
     """ Primary handler for /start command"""
+    text: Union[List[str], str]
 
     if User.objects.filter(external_id=message.from_user.id).exists():
         user = User.objects.get(external_id=message.from_user.id)
+        text = [
+            f"Привет, <b>{user.username}</b>!",
+            "Давай продолжим изучать английский",
+        ]
+        text = ' '.join(text)
         bot.send_message(
             message.from_user.id,
-            f"Привет, <b>{user.username}</b>✌️ Давай продолжим изучать английский 🧠",
+            text,
             parse_mode='HTML',
             reply_markup=start_menu()
         )
 
     else:
+        text = [
+            f"Привет, <b>{message.from_user.username}</b>z я телеграм-бот"
+            "Я могу помочь тебе в изучении английских слов",
+            "Пожалуйста, зарегистрируйся /reg",
+        ]
+        text = '\n'.join(text)
         bot.send_message(
             message.from_user.id,
-            (f"Привет, <b>{message.from_user.username}</b> ✌️, я телеграм-бот🤖\n"
-             "Я могу помочь тебе в изучении английских слов 🤓 "
-             "Пожалуйста, зарегистрируйся /reg"),
+            text,
             parse_mode='HTML'
         )
 

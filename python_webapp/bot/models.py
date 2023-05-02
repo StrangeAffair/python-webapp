@@ -1,5 +1,6 @@
 from django.db import models  # type: ignore
 
+
 # Create your models here.
 class User(models.Model):  # type: ignore
     username = models.CharField(
@@ -21,6 +22,7 @@ class User(models.Model):  # type: ignore
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
 
 class WordRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
@@ -46,8 +48,9 @@ class WordRecord(models.Model):  # type: ignore
     )
 
     class Meta:
-         verbose_name = 'Слово'
-         verbose_name_plural = 'Слова'
+        verbose_name = 'Слово'
+        verbose_name_plural = 'Слова'
+
 
 class LessonRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
@@ -69,8 +72,9 @@ class LessonRecord(models.Model):  # type: ignore
     )
 
     class Meta:
-         verbose_name = 'Занятие'
-         verbose_name_plural = 'Занятия'
+        verbose_name = 'Занятие'
+        verbose_name_plural = 'Занятия'
+
 
 class GameRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
@@ -92,5 +96,5 @@ class GameRecord(models.Model):  # type: ignore
     )
 
     class Meta:
-         verbose_name = 'Игра'
-         verbose_name_plural = 'Игры'
+        verbose_name = 'Игра'
+        verbose_name_plural = 'Игры'
