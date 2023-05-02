@@ -14,10 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # from django.contrib import admin  # type: ignore
-from django.urls import path   # type: ignore
-from . import views
-from django.views.decorators.csrf import csrf_exempt  # type: ignore
+from django.urls import path   # type: ignore # noqa: E501 # pylint: disable=E0401
+from django.views.decorators.csrf import csrf_exempt  # type: ignore # noqa: E501 # pylint: disable=E0401
 
+from . import views
 
 urlpatterns = [
     path('', csrf_exempt(views.index), name='index'),

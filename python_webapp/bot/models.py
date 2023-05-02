@@ -1,8 +1,11 @@
-from django.db import models  # type: ignore
+"""Module with models"""
+
+from django.db import models  # type: ignore # pylint: disable=E0401
 
 
 # Create your models here.
-class User(models.Model):  # type: ignore
+class User(models.Model):  # type: ignore # pylint: disable=R0903
+    """User module"""
     username = models.CharField(
           verbose_name='Никнейм',
           max_length=20
@@ -19,12 +22,14 @@ class User(models.Model):  # type: ignore
     def __str__(self) -> str:
         return f'Пользователь {self.username}'
 
-    class Meta:
+    class Meta:  # pylint: disable=R0903
+        """Name meta class"""
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
 
-class WordRecord(models.Model):  # type: ignore
+class WordRecord(models.Model):  # type: ignore # pylint: disable=R0903
+    """Word recording module"""
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',
@@ -47,12 +52,14 @@ class WordRecord(models.Model):  # type: ignore
         auto_now_add=True
     )
 
-    class Meta:
+    class Meta:  # pylint: disable=R0903
+        """Name meta class"""
         verbose_name = 'Слово'
         verbose_name_plural = 'Слова'
 
 
-class LessonRecord(models.Model):  # type: ignore
+class LessonRecord(models.Model):  # type: ignore # pylint: disable=R0903
+    """Lesson record module"""
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',
@@ -71,12 +78,14 @@ class LessonRecord(models.Model):  # type: ignore
         default='',
     )
 
-    class Meta:
+    class Meta:  # pylint: disable=R0903
+        """Name meta class"""
         verbose_name = 'Занятие'
         verbose_name_plural = 'Занятия'
 
 
-class GameRecord(models.Model):  # type: ignore
+class GameRecord(models.Model):  # type: ignore # pylint: disable=R0903
+    """Game record module"""
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',
@@ -95,6 +104,7 @@ class GameRecord(models.Model):  # type: ignore
         verbose_name='Число вопросов',
     )
 
-    class Meta:
+    class Meta:  # pylint: disable=R0903
+        """Name meta class"""
         verbose_name = 'Игра'
         verbose_name_plural = 'Игры'

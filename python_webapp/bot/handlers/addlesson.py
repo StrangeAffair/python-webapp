@@ -1,3 +1,5 @@
+"""Module for adding lessons"""
+
 from typing import List, Union
 
 from telebot import types  # type: ignore
@@ -11,8 +13,8 @@ from bot.utils import get_yes_no_inline_keyboard, start_menu
 from bot.utils import int_validator
 
 # prefixes for queries handlers
-comment_prefix = 'comment_addlesson_inline_keyboard_'
-confirm_prefix = 'confirm_addlesson_inline_keyabord_'
+COMMENT_PREFIX = 'comment_addlesson_inline_keyboard_'
+CONFIRM_PREFIX = 'confirm_addlesson_inline_keyabord_'
 
 # to store temporary data before saving in db
 g_input_user_data: Dict[int, LessonRecord] = {}
@@ -25,7 +27,6 @@ def act_on_addlesson_command(u_id: int) -> None:
     text = "Введите дату урока в формате дд.мм.гггг:"
     msg = bot.send_message(u_id, text=text)
 
-    global g_input_user_data
     g_input_user_data[u_id] = LessonRecord(user=user)
 
     bot.register_next_step_handler(msg, callback=get_date)
@@ -33,10 +34,9 @@ def act_on_addlesson_command(u_id: int) -> None:
 
 def get_date(message: types.Message) -> None:
     """ Get date from the message"""
-    global g_input_user_data
     u_id = message.from_user.id
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     entered_date = message.text
@@ -66,9 +66,8 @@ def get_duration(message: types.Message) -> None:
     text: Union[List[str], str]
 
     u_id = message.from_user.id
-    global g_input_user_data
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     entered_data = message.text
@@ -84,7 +83,7 @@ def get_duration(message: types.Message) -> None:
 
     yes_text = 'Ну разумеется 😉'
     no_text = 'Неа 🙄'
-    kb = get_yes_no_inline_keyboard(comment_prefix, yes_text, no_text)
+    kb = get_yes_no_inline_keyboard(COMMENT_PREFIX, yes_text, no_text)
 
     text = [
         f"Отлично, записал <i>{message.text}</i> (минуты)",
@@ -96,13 +95,12 @@ def get_duration(message: types.Message) -> None:
 
 def callback_on_comment(call: types.CallbackQuery) -> None:
     """ Callback on question about comment """
-    assert call.data.startswith(comment_prefix)
-    global g_input_user_data
+    assert call.data.startswith(COMMENT_PREFIX)
 
     u_id = call.message.chat.id
-    answer = call.data[len(comment_prefix):]
+    answer = call.data[len(COMMENT_PREFIX):]
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     if answer == 'yes':
@@ -121,9 +119,8 @@ def callback_on_comment(call: types.CallbackQuery) -> None:
 def get_lesson_record_comment(message: types.Message) -> None:
     """ Get comment from the message """
     u_id = message.from_user.id
-    global g_input_user_data
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     g_input_user_data[u_id].comment = message.text
@@ -134,7 +131,7 @@ def confirm_add_lesson(u_id: int) -> None:
     """ Show confirm keyboard"""
     global g_input_user_data
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     lesson = g_input_user_data[u_id]
@@ -146,20 +143,20 @@ def confirm_add_lesson(u_id: int) -> None:
 
     yes_text = "Да, все так 👍"
     no_text = "Я вводил другое 👎"
-    kb = get_yes_no_inline_keyboard(confirm_prefix, yes_text, no_text)
+    kb = get_yes_no_inline_keyboard(CONFIRM_PREFIX, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
 
 
 def callback_on_cofirm_add_lesson(call: types.CallbackQuery) -> None:
     """ Callback on confirmation"""
-    assert call.data.startswith(confirm_prefix)
+    assert call.data.startswith(CONFIRM_PREFIX)
     global g_input_user_data
 
     u_id = call.message.chat.id
-    answer = call.data[len(confirm_prefix):]
+    answer = call.data[len(CONFIRM_PREFIX):]
 
-    if not (u_id in g_input_user_data):
+    if u_id not in g_input_user_data:
         return
 
     if answer == 'yes':
@@ -179,9 +176,9 @@ def register_handler_addlesson() -> None:
     """ Register handlers for addlesson command"""
     bot.register_callback_query_handler(
         callback=callback_on_cofirm_add_lesson,
-        func=lambda call: call.data.startswith(confirm_prefix)
+        func=lambda call: call.data.startswith(CONFIRM_PREFIX)
     )
     bot.register_callback_query_handler(
         callback=callback_on_comment,
-        func=lambda call: call.data.startswith(comment_prefix)
+        func=lambda call: call.data.startswith(COMMENT_PREFIX)
     )

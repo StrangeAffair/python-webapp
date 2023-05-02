@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 
 from bot.bot_main import bot
 from bot.models import User, LessonRecord, WordRecord
-from bot.utils import start_menu, start_text
+from bot.utils import start_menu, START_TEXT
 
 stat_prefix = 'stat_inline_keyboard_'
 
@@ -108,7 +108,7 @@ def callback_on_stat_command(call: types.CallbackQuery) -> None:
         else:
             bot.send_message(u_id, text=text, parse_mode='HTML')
 
-    bot.send_message(u_id, text=start_text, parse_mode='HTML',
+    bot.send_message(u_id, text=START_TEXT, parse_mode='HTML',
                      reply_markup=start_menu())
 
 

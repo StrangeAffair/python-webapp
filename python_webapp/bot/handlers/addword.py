@@ -71,8 +71,9 @@ def get_word_record_en_word(message: types.Message) -> None:
         ]
         text = '\n'.join(text)
 
+        print(text)
         bot.send_message(u_id, text=text, parse_mode='HTML',
-                         reply_markup=start_menu)
+                         reply_markup=start_menu())
         return
 
     text = f"Записал <i>{message.text}</i>👌 Введите перевод:"
