@@ -54,7 +54,7 @@ def act_on_start_command(message: types.Message) -> None:
         ]
         text = ' '.join(text)
         """
-        text = WELCOME_BACK_MESSAGE.format(user=user.username)
+        text = WELCOME_BACK_MESSAGE.format(user=user.username)  # type: ignore # noqa: E501
         bot.send_message(
             message.from_user.id,
             text,
@@ -71,7 +71,7 @@ def act_on_start_command(message: types.Message) -> None:
         ]
         text = '\n'.join(text)
         """
-        text = WELCOME_MESSAGE.format(user=message.from_user.username)
+        text = WELCOME_MESSAGE.format(user=message.from_user.username)  # type: ignore # noqa: E501
         bot.send_message(
             message.from_user.id,
             text,
