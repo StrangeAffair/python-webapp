@@ -1,7 +1,7 @@
-from django.db import models
+from django.db import models  # type: ignore
 
 # Create your models here.
-class User(models.Model):
+class User(models.Model):  # type: ignore
     username = models.CharField(
           verbose_name='Никнейм',
           max_length=20
@@ -15,14 +15,14 @@ class User(models.Model):
         auto_now_add=True
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Пользователь {self.username}'
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
-class WordRecord(models.Model):
+class WordRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',
@@ -49,7 +49,7 @@ class WordRecord(models.Model):
          verbose_name = 'Слово'
          verbose_name_plural = 'Слова'
 
-class LessonRecord(models.Model):
+class LessonRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',
@@ -72,7 +72,7 @@ class LessonRecord(models.Model):
          verbose_name = 'Занятие'
          verbose_name_plural = 'Занятия'
 
-class GameRecord(models.Model):
+class GameRecord(models.Model):  # type: ignore
     user = models.ForeignKey(
         to='bot.User',
         verbose_name='Пользователь',

@@ -1,4 +1,4 @@
-from telebot import types
+from telebot import types  # type: ignore
 from bot.bot_main import bot
 from bot.models import User, LessonRecord, WordRecord, GameRecord
 

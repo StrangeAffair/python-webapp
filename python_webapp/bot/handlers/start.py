@@ -1,4 +1,4 @@
-from telebot import types
+from telebot import types  # type: ignore
 
 from bot.models import User
 from bot.bot_main import bot
@@ -40,6 +40,7 @@ def callback_on_start_menu(call: types.CallbackQuery) -> None:
     assert call.data.startswith(start_menu_prefix)
 
     u_id = call.message.chat.id
+    print(u_id)
     answer = call.data[len(start_menu_prefix):]
 
     if answer == 'addword':
