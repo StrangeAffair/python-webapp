@@ -8,6 +8,8 @@ from bot.models import User, WordRecord
 from bot.utils import get_yes_no_inline_keyboard, start_menu
 from bot.utils import word_validator
 
+from python_webapp.settings import LANGUAGE_CODE
+
 # prefixes to distinguish between callback queris
 comment_prefix = 'comment_addword_inline_keyboard_'
 confirm_prefix = 'confirm_addword_inline_keyabord_'
@@ -15,13 +17,67 @@ confirm_prefix = 'confirm_addword_inline_keyabord_'
 # to store data before saving in db
 g_input_user_data: Dict[int, WordRecord] = {}
 
+ADDWORD_ENWORD_TEXT: str
+ADDWORD_RUWORD_TEXT: str
+ADDWORD_COMMENT_TEXT: str
+ADDWORD_ADDCOMMENT_TEXT: str
+ADDWORD_NOCOMMENT_TEXT: str
+ADDWORD_CONFIRM_TEXT_LIST: List[str]
+ADDWORD_CONFIRM_TEXT: str
+ADDWORD_DICTADD_TEXT_LIST: List[str]
+ADDWORD_DICTADD_TEXT: str
+ADDWORD_YES: str
+ADDWORD_NO: str
+if LANGUAGE_CODE.startswith("ru"):
+    ADDWORD_ENWORD_TEXT = "Введите новое слово:"
+    ADDWORD_RUWORD_TEXT = "Записано <i>{word}</i>. Введите перевод:"
+    ADDWORD_COMMENT_TEXT = "Перевод записан <i>{word}</i>. Добавить пояснение?"
+    ADDWORD_ADDCOMMENT_TEXT = "Введите пояснение"
+    ADDWORD_NOCOMMENT_TEXT = "Пояснение отсутствует"
+    ADDWORD_CONFIRM_TEXT_LIST = [
+        "Все правильно?",
+        "Слово: <i>{en_word}</i>",
+        "Перевод: <i>{ru_word}</i>",
+        "Комментарий: <i>{comment}</i>",
+    ]
+    ADDWORD_CONFIRM_TEXT = '\n'.join(ADDWORD_CONFIRM_TEXT_LIST)
+    ADDWORD_DICTADD_TEXT_LIST = [
+        "Cлово",
+        "<i>{word}</i>",
+        "успешно добавлено в словарь",
+    ]
+    ADDWORD_DICTADD_TEXT = ' '.join(ADDWORD_DICTADD_TEXT_LIST)
+    ADDWORD_YES = "Да"
+    ADDWORD_NO = "Нет"
+else:
+    ADDWORD_ENWORD_TEXT = "Enter new word:"
+    ADDWORD_RUWORD_TEXT = "Written down word <i>{word}</i>. Enter translation:"
+    ADDWORD_COMMENT_TEXT = "Written down translation <i>{word}</i>. Comment?"
+    ADDWORD_ADDCOMMENT_TEXT = "Enter comment"
+    ADDWORD_NOCOMMENT_TEXT = "No comment"
+    ADDWORD_CONFIRM_TEXT_LIST = [
+        "All is right?",
+        "Word: <i>{en_word}</i>",
+        "Translation: <i>{ru_word}</i>",
+        "Comment: <i>{comment}</i>",
+    ]
+    ADDWORD_CONFIRM_TEXT = '\n'.join(ADDWORD_CONFIRM_TEXT_LIST)
+    ADDWORD_DICTADD_TEXT_LIST = [
+        "Word",
+        "<i>{word}</i>",
+        "was added to dictonary",
+    ]
+    ADDWORD_DICTADD_TEXT = ' '.join(ADDWORD_DICTADD_TEXT_LIST)
+    ADDWORD_YES = "Yes"
+    ADDWORD_NO = "No"
+
 
 def act_on_addword_command(u_id: int) -> None:
     """ Handler to addword command"""
 
     user = User.objects.get(external_id=u_id)
 
-    text = "Введите новое слово:"
+    text = ADDWORD_ENWORD_TEXT
     msg = bot.send_message(u_id, text=text)
 
     global g_input_user_data
@@ -76,7 +132,7 @@ def get_word_record_en_word(message: types.Message) -> None:
                          reply_markup=start_menu())
         return
 
-    text = f"Записано <i>{message.text}</i>. Введите перевод:"
+    text = ADDWORD_RUWORD_TEXT.format(word=message.text)
 
     bot.send_message(u_id, text=text, parse_mode='HTML')
 
@@ -114,10 +170,10 @@ def get_word_record_ru_translation(message: types.Message) -> None:
 
     g_input_user_data[u_id].ru_translation = message.text
 
-    text = f"Перевод записан <i>{message.text}</i>. Добавить пояснение?"
+    text = ADDWORD_COMMENT_TEXT.format(word=message.text)
 
-    yes_text = 'Да'
-    no_text = 'Нет'
+    yes_text = ADDWORD_YES
+    no_text = ADDWORD_NO
     kb = get_yes_no_inline_keyboard(comment_prefix, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
@@ -131,10 +187,10 @@ def callback_on_comment(call: types.CallbackQuery) -> None:
     answer = call.data[len(comment_prefix):]
 
     if answer == 'yes':
-        msg = bot.send_message(u_id, text="Введите пояснение")
+        msg = bot.send_message(u_id, text=ADDWORD_ADDCOMMENT_TEXT)
         bot.register_next_step_handler(msg, callback=get_word_record_comment)
     elif answer == 'no':
-        msg = bot.send_message(u_id, text="Пояснение отсутствует")
+        msg = bot.send_message(u_id, text=ADDWORD_NOCOMMENT_TEXT)
         confirm_add_word(u_id)
 
 
@@ -160,13 +216,14 @@ def confirm_add_word(u_id: int) -> None:
     word = g_input_user_data[u_id]
 
     comment = f"\n({word.comment})" if word.comment != '' else ''
-    text = (f"Все правильно?\n"
-            f"Слово: <i>{word.en_word}</i>\n"
-            f"Перевод: <i>{word.ru_translation}</i>" +
-            comment)
+    text = ADDWORD_CONFIRM_TEXT.format(
+        en_word=word.en_word,
+        ru_word=word.ru_translation,
+        comment=comment
+    )
 
-    yes_text = "Да"
-    no_text = "Нет"
+    yes_text = ADDWORD_YES
+    no_text = ADDWORD_NO
     kb = get_yes_no_inline_keyboard(confirm_prefix, yes_text, no_text)
 
     bot.send_message(u_id, text=text, reply_markup=kb, parse_mode='HTML')
@@ -187,12 +244,9 @@ def callback_on_cofirm_add_word(call: types.CallbackQuery) -> None:
 
     if answer == 'yes':
         g_input_user_data[u_id].save()
-        text = [
-            "Cлово",
-            f"<i>{g_input_user_data[u_id].en_word}</i>",
-            "успешно добавлено в словарь",
-        ]
-        text = ' '.join(text)
+        text = ADDWORD_DICTADD_TEXT.format(
+            word=g_input_user_data[u_id].en_word
+        )
 
     elif answer == 'no':
         text = "Упс... Давайте попробуем еще раз"

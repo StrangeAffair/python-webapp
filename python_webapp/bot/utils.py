@@ -3,6 +3,23 @@
 from datetime import datetime
 from telebot import types  # type: ignore # pylint: disable=E0401
 
+from python_webapp.settings import LANGUAGE_CODE
+
+BUTTON_ADDWORD_TEXT: str
+BUTTON_ADDLESSON_TEXT: str
+BUTTON_REPEAT_TEXT: str
+BUTTON_STAT_TEXT: str
+if LANGUAGE_CODE.startswith("ru"):
+    BUTTON_ADDWORD_TEXT = "Добавить новое слово"
+    BUTTON_ADDLESSON_TEXT = "Записать урок"
+    BUTTON_REPEAT_TEXT = "Повторять слова"
+    BUTTON_STAT_TEXT = "Статистика"
+else:
+    BUTTON_ADDWORD_TEXT = "Add new word"
+    BUTTON_ADDLESSON_TEXT = "Add new lesson"
+    BUTTON_REPEAT_TEXT = "Repeat words"
+    BUTTON_STAT_TEXT = "Statistics"
+
 
 def date_validator(data_text: str) -> bool:
     """validate date"""
@@ -57,7 +74,10 @@ def get_yes_no_inline_keyboard(prefix: str, yes_text: str, no_text: str
 
 
 START_MENU_PREFIX = "start_menu_keyboard_"
-START_TEXT = "Давай продолжим изучать английский 🧠"
+if LANGUAGE_CODE.startswith("ru"):
+    START_TEXT = "Давай продолжим изучать английский 🧠"
+else:
+    START_TEXT = "Lets continue study english"
 
 
 def start_menu() -> types.InlineKeyboardMarkup:
@@ -66,19 +86,19 @@ def start_menu() -> types.InlineKeyboardMarkup:
 
     ikbm.add(
         types.InlineKeyboardButton(
-            text='Добавить новое слово',
+            text=BUTTON_ADDWORD_TEXT,
             callback_data=START_MENU_PREFIX + 'addword'
         ),
         types.InlineKeyboardButton(
-            text='Записать урок',
+            text=BUTTON_ADDLESSON_TEXT,
             callback_data=START_MENU_PREFIX + 'addlesson'
         ),
         types.InlineKeyboardButton(
-            text='Повторять слова',
+            text=BUTTON_REPEAT_TEXT,
             callback_data=START_MENU_PREFIX + 'game'
         ),
         types.InlineKeyboardButton(
-            text='Статистика',
+            text=BUTTON_STAT_TEXT,
             callback_data=START_MENU_PREFIX + 'stat'
         )
     )
